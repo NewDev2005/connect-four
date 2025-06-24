@@ -7,7 +7,6 @@ class Board
 
   def set_the_board
     populate_the_board_with_hollow_circle
-    board
   end
 
   def print_board
