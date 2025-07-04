@@ -3,6 +3,7 @@
 source "https://rubygems.org"
 
 # gem "rails"
+gem "colorize"
 gem "rubocop"
 gem "rubocop-packaging"
 gem "rubocop-performance", require: false

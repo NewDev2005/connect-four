@@ -33,7 +33,3 @@ class Board
     puts "   0 1 2 3 4 5 6"
   end
 end
-
-# obj = Board.new
-# obj.set_the_board
-# obj.print_board
