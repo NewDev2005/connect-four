@@ -3,9 +3,9 @@ require_relative "module"
 require_relative "player"
 require "colorize"
 
-class Game # rubocop:disable Style/Documentation
+class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
   include Coordinates
-  def initialize(player = Player.new, board = Board.new)
+  def initialize(player = Player.new, board = Board.new) # rubocop:disable Metrics/MethodLength
     @player1 = player
     @player2 = player
     @board = board
@@ -68,29 +68,40 @@ class Game # rubocop:disable Style/Documentation
     @board.print_board
   end
 
-  def play_game # rubocop:disable Metrics/MethodLength
+  def play_game # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
     displays_the_board_before_the_game_begins
     chip_color = nil
     winning_horizontal_coords
     loop do
+      print "\n"
+      print ">>> "
       user_input = @player1.make_move
       chip_color = :red
+
+      user_input = invalid_move(user_input)
       break if user_input == "exit"
+
+      user_input = illegal_move(user_input)
+      user_input = illegal_move2(user_input)
 
       register_move(user_input, chip_color)
       break if check_winner?(user_input, chip_color)
 
+      print "\n"
+      print ">>> "
       user_input = @player2.make_move
       chip_color = :green
+
+      user_input = invalid_move(user_input)
       break if user_input == "exit"
+
+      user_input = illegal_move(user_input)
+      user_input = illegal_move2(user_input)
+
 
       register_move(user_input, chip_color)
       break if check_winner?(user_input, chip_color)
     end
-  end
-
-  def check_winner?(player_input, color)
-    return true if check_correct_chip_placement?(player_input, color) # rubocop:disable Style/RedundantReturn
   end
 
   private
@@ -110,7 +121,7 @@ class Game # rubocop:disable Style/Documentation
     displays_the_board_with_hollow_circle_once
   end
 
-  def winning_horizontal_coords # rubocop:disable Metrics/MethodLength
+  def winning_horizontal_coords
     @vertical_placement.each do |sub_arr|
       arr = []
       sub_arr.each do |elem|
@@ -131,11 +142,59 @@ class Game # rubocop:disable Style/Documentation
         end
       end
     end
+
     types_of_chip_placement.each do |multi_dimen_arr|
       multi_dimen_arr.each do |sub_arr|
         return true if sub_arr.all?(:red) || sub_arr.all?(:green)
       end
     end
     false
+  end
+
+  def check_winner?(player_input, color)
+    return true if check_correct_chip_placement?(player_input, color) # rubocop:disable Style/RedundantReturn
+  end
+
+  def check_input_is_equivalent_to_coord?(player_input)
+    coordinates.each do |key, value|
+      return true if player_input == key && @board.hollow_circle[value] != "\u25EF"
+    end
+    false
+  end
+
+  def illegal_move2(player_input)
+    while check_input_is_equivalent_to_coord?(player_input)
+      puts "A chip has been placed at #{player_input} already kindly try a different move!".colorize(:yellow)
+      player_input = gets.chomp
+    end
+    player_input
+  end
+
+  def check_if_chip_is_placed_above_another_chip?(player_input)
+    str = player_input
+    arr = str.split(",").map(&:to_i)
+    arr[0] = arr[0] - 1
+    coord = arr.map(&:to_s).join(",")
+    coordinates.each do |key, value|
+      return false if coord == key && @board.hollow_circle[value] == "\u25EF"
+    end
+    true
+  end
+
+  def illegal_move(player_input)
+    until check_if_chip_is_placed_above_another_chip?(player_input)
+      puts "Sorry but This not how this game works!".colorize(:red)
+      player_input = gets.chomp
+      player_input = invalid_move(player_input)
+    end
+    player_input
+  end
+
+  def invalid_move(player_input)
+    until coordinates.key?(player_input) || player_input == "exit"
+      puts "INVALID INPUT!>> re-enter a valid coord".colorize(:red)
+      player_input = gets.chomp
+    end
+    player_input
   end
 end
