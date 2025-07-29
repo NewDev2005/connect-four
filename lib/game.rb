@@ -65,7 +65,6 @@ class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
     coordinates.each do |key, value|
       @board.hollow_circle[value] = "\u25CF".colorize(color) if user_input == key
     end
-    @board.print_board
   end
 
   def displays_the_board_before_the_game_begins
@@ -81,10 +80,23 @@ class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
     player_input
   end
 
+  def illegal_move(player_input)
+    until check_if_chip_is_placed_above_another_chip?(player_input)
+      puts "Sorry but This not how this game works!".colorize(:red)
+      player_input = gets.chomp
+      player_input = check_invalid_move(player_input)
+    end
+    player_input
+  end
+
+  def check_winner?(player_input, color)
+    winning_horizontal_coords while @horizontal_placement.empty?
+    return true if check_correct_chip_placement?(player_input, color) # rubocop:disable Style/RedundantReturn
+  end
+
   def play_game # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
     displays_the_board_before_the_game_begins
     chip_color = nil
-    winning_horizontal_coords
     loop do
       print "\n"
       print ">>> "
@@ -98,6 +110,7 @@ class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
       user_input = illegal_move2(user_input)
 
       register_move(user_input, chip_color)
+      @board.print_board
       break if check_winner?(user_input, chip_color)
 
       print "\n"
@@ -111,8 +124,8 @@ class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
       user_input = illegal_move(user_input)
       user_input = illegal_move2(user_input)
 
-
       register_move(user_input, chip_color)
+      @board.print_board
       break if check_winner?(user_input, chip_color)
     end
   end
@@ -159,10 +172,6 @@ class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
     false
   end
 
-  def check_winner?(player_input, color)
-    return true if check_correct_chip_placement?(player_input, color) # rubocop:disable Style/RedundantReturn
-  end
-
   def check_input_is_equivalent_to_coord?(player_input)
     coordinates.each do |key, value|
       return true if player_input == key && @board.hollow_circle[value] != "\u25EF"
@@ -179,15 +188,6 @@ class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
       return false if coord == key && @board.hollow_circle[value] == "\u25EF"
     end
     true
-  end
-
-  def illegal_move(player_input)
-    until check_if_chip_is_placed_above_another_chip?(player_input)
-      puts "Sorry but This not how this game works!".colorize(:red)
-      player_input = gets.chomp
-      player_input = invalid_move(player_input)
-    end
-    player_input
   end
 
   def illegal_move2(player_input)
