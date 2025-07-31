@@ -82,16 +82,27 @@ class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
 
   def illegal_move(player_input)
     until check_if_chip_is_placed_above_another_chip?(player_input)
+      player_input = check_invalid_move(player_input)
       puts "Sorry but This not how this game works!".colorize(:red)
       player_input = gets.chomp
-      player_input = check_invalid_move(player_input)
+      # player_input = check_invalid_move(player_input)
+    end
+    player_input
+  end
+
+  def illegal_move2(player_input)
+    while check_input_is_equivalent_to_coord?(player_input)
+      puts "A chip has been placed at #{player_input} already kindly try a different move!".colorize(:yellow)
+      player_input = gets.chomp
     end
     player_input
   end
 
   def check_winner?(player_input, color)
     winning_horizontal_coords while @horizontal_placement.empty?
-    return true if check_correct_chip_placement?(player_input, color) # rubocop:disable Style/RedundantReturn
+    return true if check_correct_chip_placement?(player_input, color)
+
+    false
   end
 
   def play_game # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
@@ -188,13 +199,5 @@ class Game # rubocop:disable Style/Documentation,Metrics/ClassLength
       return false if coord == key && @board.hollow_circle[value] == "\u25EF"
     end
     true
-  end
-
-  def illegal_move2(player_input)
-    while check_input_is_equivalent_to_coord?(player_input)
-      puts "A chip has been placed at #{player_input} already kindly try a different move!".colorize(:yellow)
-      player_input = gets.chomp
-    end
-    player_input
   end
 end
