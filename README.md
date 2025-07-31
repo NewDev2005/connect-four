@@ -1,2 +1,2 @@
 # connect-four
-<p>In order to get acquainted with connect-four game or to understand how the game works, kindly check out this <a href="https://en.wikipedia.org/wiki/Connect_Four">wikipedia page</a></p>
+<p>In order to get acquainted with connect-four game or to understand how the game works, kindly check out this <a href="https://en.wikipedia.org/wiki/Connect_Four" target="_blank" rel="noreferrer">wikipedia page</a></p>
